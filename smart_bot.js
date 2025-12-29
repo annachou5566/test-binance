@@ -92,4 +92,30 @@ async function rewriteWithAI(originalText, webContent) {
             }
         }
     });
+
+// --- 🧪 KHU VỰC TEST THỬ NGAY LẬP TỨC ---
+    console.log("\n🧪 ĐANG CHẠY TEST GIẢ LẬP...");
+    
+    // 1. Giả bộ có một tin nhắn mới từ Binance (kèm Link thật)
+    const tinGiaLap = "Binance Will List Starpower (STAR) with Seed Tag Applied https://www.binance.com/en/support/announcement/binance-will-list-starpower-star-with-seed-tag-applied-bfa64ab3c47d4d2c8b69f3ebb50d81a8";
+    
+    console.log("1. Đang thử đọc link từ tin giả lập...");
+    const urlTest = tinGiaLap.match(/(https?:\/\/[^\s]+)/)[0];
+    const webContent = await scrapeContent(urlTest);
+    
+    if (webContent) {
+        console.log(`   -> Đã đọc được nội dung web (${webContent.length} ký tự).`);
+        
+        console.log("2. Đang gửi cho AI tóm tắt...");
+        const ketQua = await rewriteWithAI(tinGiaLap, webContent);
+        
+        console.log("3. Đang gửi kết quả về Saved Messages...");
+        await client.sendMessage("me", { message: "🧪 [TEST MODE]\n" + ketQua });
+        console.log("✅ TEST THÀNH CÔNG! Kiểm tra tin nhắn lưu trữ của bạn đi.");
+    } else {
+        console.log("❌ Lỗi: Không đọc được link test.");
+    }
+    // ------------------------------------------
+
+    
 })();
