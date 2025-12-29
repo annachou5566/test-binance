@@ -6,56 +6,38 @@ const cheerio = require("cheerio");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // ============================================================
-// 👇👇👇 KHU VỰC CẤU HÌNH 👇👇👇
+// 👇 KHU VỰC CẤU HÌNH (ĐÃ ĐIỀN SẴN CHO BẠN) 👇
 
-// 1. API KEY GOOGLE (Đã điền xong)
 const GEMINI_API_KEY = "AIzaSyCNTgB_8biriz6UcWTfZ81xeW-0m8MKruY"; 
+const apiId = 35224567;      
+const apiHash = "a5d0165149f98b056af275b9311116fa"; 
 
-// 2. THÔNG TIN TELEGRAM (Sẽ hướng dẫn lấy bên dưới)
-const apiId = 35224567;      // ⚠️ THAY SỐ NÀY (Xem hướng dẫn Bước 2)
-const apiHash = "a5d0165149f98b056af275b9311116fa"; // ⚠️ THAY CHUỖI NÀY (Xem hướng dẫn Bước 2)
-
-// 3. CẤU HÌNH KÊNH
-// Kênh nguồn: Lấy tin từ kênh chính thức của Binance
 const SOURCE_CHANNEL = "binance_announcements"; 
-// Kênh đích: Để là "me" để bot gửi tin về mục "Tin nhắn lưu trữ" (Saved Messages) của bạn
-// Sau này chạy ổn thì đổi thành ID kênh hoặc Username kênh của bạn
 const MY_CHANNEL = "me"; 
+
+// 👇 ĐÃ ĐIỀN SESSION MỚI NHẤT CỦA BẠN VÀO ĐÂY 👇
+const STRING_SESSION = "1BQANOTEuMTA4LjU2LjE4NgG7CPXi7lV75LbAFSOLi4ccT1JkHKq6BfDCvIXJynfBL3YYIDKADO+pmMO4bUg5YY9yG1iUPqyEmtqkPu1ySMmjBulgH/z13dkmxQgzBaB0o5qn+6jO0J5YUH5YJkLNg3Rj2AGnYa6Jdjv0m5I5srqhw1hd5FMYe2gTs/kNP7xZvbCP2vw3Svtw9D6VbizPOtVZNPaSezkZ49nM3NWoyWgBIm65WYdKKP08eRqIKgcja/ofDgo9nF3RC3vca/tVGINWiT5ZXRj903LX1UfxxuB6NVFjR2MPQaPUBovZJLiiqlqGw4BCw1boSrkmftTMCwZeV8oGW9MYO/JYVy2+XDEVbQ==";
 
 // ============================================================
 
-const STRING_SESSION = "1BQANOTEuMTA4LjU2LjE4NgG7sWhHB0KEUsb7Zn7YXZGDd8hwwELza+5O+F6WwC6lFdlgtcTwVivdeeg4mB5mVDQ2SvWXAdBX//e2/+/cVMdXw1T05msnoBXEs/3ClmA3lZkZQTCad5vJTCe42Nw+nUoRULi88CfWpcqcDf5zsI8OzBTBW1O1xjbaaQ5EevnMFJtmK/XjwfKKgzQQaj9e7VfoWaw6WQbF/rLEezSubwkGG0z3GeNxsVudJYH/RRM7TFV1PypxaSJBnMbjUfNgDuSP9Asi1B5HZHd2768oKXkLdqUqhh23CMM18TIlbMztuuebl7/5t5Vj4olKhwLamnMDRKl+eL7M8LT7xhdlFs3o9Q=="; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 async function scrapeContent(url) {
     try {
         console.log(`🌍 Đang đọc bài viết: ${url}`);
-        const { data } = await axios.get(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
+        const { data } = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
         const $ = cheerio.load(data);
-        let text = $('body').text().replace(/\s\s+/g, ' ').substring(0, 8000); 
-        return text;
+        return $('body').text().replace(/\s\s+/g, ' ').substring(0, 8000); 
     } catch (e) { return null; }
 }
 
 async function rewriteWithAI(originalText, webContent) {
     console.log("🤖 AI đang viết lại tin...");
-    const prompt = `
-    Bạn là admin Crypto. Tóm tắt tin này sang tiếng Việt ngắn gọn:
-    - Tin gốc: "${originalText}"
-    - Nội dung web: "${webContent}"
-    
-    Yêu cầu:
-    - Tiêu đề in đậm, dùng icon.
-    - Ý chính: Token nào? Thưởng bao nhiêu? Làm gì để nhận?
-    - Cuối cùng ghi: "👉 Nguồn: Bot của [Tên Bạn]"
-    `;
+    const prompt = `Tóm tắt tin này sang tiếng Việt ngắn gọn: "${originalText}". Nội dung web: "${webContent}". Yêu cầu: Tiêu đề in đậm, dùng icon, ghi rõ Token nào, Thưởng bao nhiêu.`;
     try {
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return (await result.response).text();
     } catch (e) { return "Lỗi AI: " + originalText; }
 }
 
@@ -65,13 +47,12 @@ async function rewriteWithAI(originalText, webContent) {
 
     await client.start({
         phoneNumber: async () => await input.text("Nhập SĐT (+84...): "),
-        password: async () => await input.text("Nhập Pass 2FA (nếu có): "),
-        phoneCode: async () => await input.text("Nhập mã gửi về Tele: "),
+        password: async () => await input.text("Nhập Pass 2FA: "),
+        phoneCode: async () => await input.text("Nhập mã Tele: "),
         onError: (err) => console.log(err),
     });
 
-    console.log("✅ Đăng nhập thành công! Đang chờ tin Binance...");
-    console.log("Session String (Lưu lại để dùng sau):", client.session.save());
+    console.log("✅ Đăng nhập thành công! (Không cần nhập lại SĐT nữa)");
 
     client.addEventHandler(async (event) => {
         if (event.message && event.message.chat) {
@@ -79,43 +60,34 @@ async function rewriteWithAI(originalText, webContent) {
             if (chat.username === SOURCE_CHANNEL) { 
                 const msg = event.message.text;
                 console.log("📩 Phát hiện tin mới!");
-
                 const urlMatch = msg.match(/(https?:\/\/[^\s]+)/);
                 let content = msg;
                 if (urlMatch) {
                     const webContent = await scrapeContent(urlMatch[0]);
                     if (webContent) content = await rewriteWithAI(msg, webContent);
                 }
-
                 await client.sendMessage(MY_CHANNEL, { message: content });
                 console.log("✅ Đã gửi tin!");
             }
         }
     });
 
-// --- 🧪 KHU VỰC TEST THỬ NGAY LẬP TỨC ---
-    console.log("\n🧪 ĐANG CHẠY TEST GIẢ LẬP...");
+    // --- 👇 KHU VỰC TEST GIẢ LẬP (ĐÃ THÊM VÀO) 👇 ---
+    console.log("\n🧪 ĐANG CHẠY TEST GIẢ LẬP NGAY LẬP TỨC...");
+    const tinGiaLap = "Link Test: https://www.binance.com/en/support/announcement/binance-will-list-starpower-star-with-seed-tag-applied-bfa64ab3c47d4d2c8b69f3ebb50d81a8";
     
-    // 1. Giả bộ có một tin nhắn mới từ Binance (kèm Link thật)
-    const tinGiaLap = "Binance Will List Starpower (STAR) with Seed Tag Applied https://www.binance.com/en/support/announcement/binance-will-list-starpower-star-with-seed-tag-applied-bfa64ab3c47d4d2c8b69f3ebb50d81a8";
-    
-    console.log("1. Đang thử đọc link từ tin giả lập...");
-    const urlTest = tinGiaLap.match(/(https?:\/\/[^\s]+)/)[0];
-    const webContent = await scrapeContent(urlTest);
+    console.log("1. Đọc link...");
+    const webContent = await scrapeContent("https://www.binance.com/en/support/announcement/binance-will-list-starpower-star-with-seed-tag-applied-bfa64ab3c47d4d2c8b69f3ebb50d81a8");
     
     if (webContent) {
-        console.log(`   -> Đã đọc được nội dung web (${webContent.length} ký tự).`);
-        
-        console.log("2. Đang gửi cho AI tóm tắt...");
+        console.log("2. Gửi AI tóm tắt...");
         const ketQua = await rewriteWithAI(tinGiaLap, webContent);
-        
-        console.log("3. Đang gửi kết quả về Saved Messages...");
-        await client.sendMessage("me", { message: "🧪 [TEST MODE]\n" + ketQua });
-        console.log("✅ TEST THÀNH CÔNG! Kiểm tra tin nhắn lưu trữ của bạn đi.");
+        console.log("3. Gửi tin nhắn...");
+        await client.sendMessage("me", { message: "🧪 [BẢN TIN TEST]\n" + ketQua });
+        console.log("✅ THÀNH CÔNG RỰC RỠ! Kiểm tra điện thoại đi!");
     } else {
-        console.log("❌ Lỗi: Không đọc được link test.");
+        console.log("❌ Lỗi đọc link test.");
     }
-    // ------------------------------------------
+    // ------------------------------------------------
 
-    
 })();
