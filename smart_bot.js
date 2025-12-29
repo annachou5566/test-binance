@@ -24,7 +24,7 @@ const MY_CHANNEL = "me";
 
 // ============================================================
 
-const STRING_SESSION = ""; 
+const STRING_SESSION = "1BQANOTEuMTA4LjU2LjE4NgG7sWhHB0KEUsb7Zn7YXZGDd8hwwELza+5O+F6WwC6lFdlgtcTwVivdeeg4mB5mVDQ2SvWXAdBX//e2/+/cVMdXw1T05msnoBXEs/3ClmA3lZkZQTCad5vJTCe42Nw+nUoRULi88CfWpcqcDf5zsI8OzBTBW1O1xjbaaQ5EevnMFJtmK/XjwfKKgzQQaj9e7VfoWaw6WQbF/rLEezSubwkGG0z3GeNxsVudJYH/RRM7TFV1PypxaSJBnMbjUfNgDuSP9Asi1B5HZHd2768oKXkLdqUqhh23CMM18TIlbMztuuebl7/5t5Vj4olKhwLamnMDRKl+eL7M8LT7xhdlFs3o9Q=="; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
