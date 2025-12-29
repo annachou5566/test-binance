@@ -1,15 +1,16 @@
 {
-  "name": "binance-bot-test",
+  "name": "smart-crypto-bot",
   "version": "1.0.0",
-  "description": "Test bot",
-  "main": "index.js",
+  "description": "Bot doc tin va tom tat bang AI",
+  "main": "smart_bot.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node smart_bot.js"
   },
   "dependencies": {
-    "ws": "^8.13.0",
-    "crypto-js": "^4.1.1",
-    "axios": "^1.4.0",
-    "dotenv": "^16.0.3"
+    "telegram": "^2.19.10",
+    "input": "^1.0.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "@google/generative-ai": "^0.1.3"
   }
 }
